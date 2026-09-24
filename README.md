@@ -6,8 +6,6 @@ It does not capture the screen, move the mouse, or steal focus. It asks Safari's
 for a button whose visible label is a configured Skip Label on a YouTube page, and sends it an
 accessibility press. Safari can be on any display and behind other windows.
 
-Vocabulary used in the code and docs is defined in [CONTEXT.md](CONTEXT.md).
-
 ## Requirements
 
 - macOS 14 or newer (built on macOS 27).
