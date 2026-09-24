@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>YTSkipper test page</title>
+<style>
+  body { font-family: -apple-system, sans-serif; margin: 2rem; max-width: 720px; }
+  a.skip-nav { position: absolute; top: 0.5rem; left: 0.5rem; }
+  .player { position: relative; background: #000; color: #fff; height: 360px; margin: 1rem 0; }
+  .ytp-skip-ad-button, .stubborn { position: absolute; right: 1rem; bottom: 3rem; font-size: 1.1rem;
+    padding: 0.6rem 1rem; background: rgba(255,255,255,0.9); border: 0; border-radius: 4px; cursor: pointer; }
+  .stubborn { bottom: 8rem; }
+  .hidden { display: none; }
+  .status { position: absolute; left: 1rem; top: 1rem; font-size: 0.9rem; opacity: 0.8; }
+  label { display: block; margin: 0.4rem 0; }
+  code { background: #eee; padding: 0 0.3rem; }
+</style>
+</head>
+<body>
+<a class="skip-nav" href="#content">Skip navigation</a>
+
+<h1 id="content">YTSkipper test page</h1>
+<p>Serve with <code>make testpage</code>, add <code>"localhost"</code> to <code>hosts</code> in
+<code>docs/config.json</code>, then watch the menu bar counter. The decoy "Skip navigation" link above must never be pressed.</p>
+
+<div class="player">
+  <div class="status" id="status">Ad playing… Skip Button appears in <span id="countdown">3</span>s</div>
+  <button class="ytp-skip-ad-button hidden" id="skip"><span class="ytp-skip-ad-button__text">Skip</span></button>
+  <button class="stubborn hidden" id="stubborn">Skip Ad</button>
+</div>
+
+<p>Skips on this page: <strong id="skips">0</strong>. The button comes back 4s after each Skip.</p>
+
+<label><input type="checkbox" id="stubbornToggle"> Show a stubborn "Skip Ad" button that ignores presses
+  (expect exactly 3 presses, then nothing) — presses received: <strong id="stubbornPresses">0</strong></label>
+<label><input type="checkbox" id="foreignToggle"> Relabel the Skip Button as "Пропустить"
+  (expect no press and an "unrecognised label" line in Console)</label>
+
+<script>
+  const skip = document.getElementById('skip');
+  const skipText = skip.querySelector('span');
+  const status = document.getElementById('status');
+  const countdown = document.getElementById('countdown');
+  const skips = document.getElementById('skips');
+  const stubborn = document.getElementById('stubborn');
+  const stubbornPresses = document.getElementById('stubbornPresses');
+  let total = 0;
+
+  function showSkipAfter(seconds) {
+    let left = seconds;
+    countdown.textContent = left;
+    status.classList.remove('hidden');
+    const timer = setInterval(() => {
+      left -= 1;
+      countdown.textContent = left;
+      if (left <= 0) {
+        clearInterval(timer);
+        status.classList.add('hidden');
+        skip.classList.remove('hidden');
+      }
+    }, 1000);
+  }
+
+  skip.addEventListener('click', () => {
+    skip.classList.add('hidden');
+    total += 1;
+    skips.textContent = total;
+    showSkipAfter(4);
+  });
+
+  document.getElementById('stubbornToggle').addEventListener('change', (e) => {
+    stubbornPresses.textContent = '0';
+    stubborn.classList.toggle('hidden', !e.target.checked);
+  });
+  let stubbornCount = 0;
+  stubborn.addEventListener('click', () => {
+    stubbornCount += 1;
+    stubbornPresses.textContent = stubbornCount;
+  });
+
+  document.getElementById('foreignToggle').addEventListener('change', (e) => {
+    skipText.textContent = e.target.checked ? 'Пропустить' : 'Skip';
+  });
+
+  showSkipAfter(3);
+</script>
+</body>
+</html>
